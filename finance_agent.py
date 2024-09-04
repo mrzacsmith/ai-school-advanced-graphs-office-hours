@@ -1,18 +1,15 @@
 import os
-import json
-import operator
 import pandas as pd
 from io import StringIO
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from openai import OpenAI
 from langgraph.graph import StateGraph, END
 from tavily import TavilyClient
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.pydantic_v1 import BaseModel
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.checkpoint.memory import MemorySaver
-from typing import TypedDict, Annotated, List
+from typing import List
 
 # memory = SqliteSaver.from_conn_string(":memory:")
 memory = MemorySaver()
@@ -29,7 +26,6 @@ llm_model = ChatOpenAI(
     temperature=0,
 )
 tavily = TavilyClient(api_key=tavily_key)
-# search = TavilySearchResults(k=10, tavily_api_key=tavily_key)
 
 
 class AgentState(BaseModel):
