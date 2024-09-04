@@ -115,14 +115,21 @@ def analyze_data_node(state: AgentState):
 def research_competitors_node(state: AgentState):
     content = state.content or []
     for competitor in state.competitors:
-        queries = llm_model.with_structured_output(Queries).invoke(
-            messages=[
+        # Create a prompt for the LLM to generate queries
+        prompt = f"Generate search queries to research financial information about {competitor}. The queries should help gather data for comparison with our company (Awesome Software Inc.)."
+
+        # Invoke the LLM with the prompt
+        response = llm_model.invoke(
+            [
                 SystemMessage(content=RESEARCH_COMPETITORS_PROMPT),
-                HumanMessage(content=f"Here is the financial data for {competitor}"),
+                HumanMessage(content=prompt),
             ]
         )
 
-        for query in queries.queries:
+        # Parse the response into a list of queries
+        queries = [q.strip() for q in response.content.split("\n") if q.strip()]
+
+        for query in queries:
             search_results = tavily.search(query=query, max_results=2)
             for r in search_results["results"]:
                 content.append(r["content"])
