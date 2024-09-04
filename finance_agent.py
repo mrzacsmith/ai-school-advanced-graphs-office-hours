@@ -213,6 +213,7 @@ flow.add_edge("research_critique", "compare_performance")
 flow.add_edge("compare_performance", "write_report")
 
 graph = flow.compile(checkpointer=memory)
+graph.get_graph().draw_mermaid_png(output_file_path="graph.png")
 
 # COMMENT OUT AFTER TESTING TO USE STREAMLIT
 
