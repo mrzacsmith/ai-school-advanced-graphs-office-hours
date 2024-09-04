@@ -44,7 +44,7 @@ class AgentState(BaseModel):
     report: str = ""
     content: List[str]
     revision_number: int
-    max_revision_number: int
+    max_revisions: int
 
 
 class Queries(BaseModel):
@@ -218,30 +218,75 @@ flow.add_edge("compare_performance", "write_report")
 
 graph = flow.compile(checkpointer=memory)
 
+# COMMENT OUT AFTER TESTING TO USE STREAMLIT
 
-def read_csv_file(csv_file_path: str) -> str:
-    with open(csv_file_path, "r") as file:
-        print("Reading CSV file...")
-        return file.read()
+# def read_csv_file(csv_file_path: str) -> str:
+#     with open(csv_file_path, "r") as file:
+#         print("Reading CSV file...")
+#         return file.read()
 
 
-if __name__ == "__main__":
-    task = "Analyze the financial data for our company (Awesome Software Inc.) comparing to our competitors."
-    competitors = ["invidia"]
-    csv_file_path = "./data/financial_data.csv"
+# if __name__ == "__main__":
+#     task = "Analyze the financial data for our company (Awesome Software Inc.) comparing to our competitors."
+#     competitors = ["invidia"]
+#     csv_file_path = "./data/financial_data.csv"
 
-    if not os.path.exists(csv_file_path):
-        print(f"File {csv_file_path} does not exist")
-    else:
-        print("starting...")
-        csv_data = read_csv_file(csv_file_path)
+#     if not os.path.exists(csv_file_path):
+#         print(f"File {csv_file_path} does not exist")
+#     else:
+#         print("starting...")
+#         csv_data = read_csv_file(csv_file_path)
+
+#         initial_state = AgentState(
+#             task=task,
+#             competitors=competitors,
+#             csv_file=csv_data,
+#             revision_number=1,
+#             max_revision_number=2,
+#             financial_data="",
+#             analysis="",
+#             competitor_data="",
+#             comparison="",
+#             feedback="",
+#             report="",
+#             content=[],
+#         )
+
+#     thread = {"configurable": {"thread_id": "1"}}
+
+#     for s in graph.stream(initial_state, thread):
+#         print(s)
+
+
+#  STREAMLIT CODE
+import streamlit as st
+
+
+def main():
+    st.title("Financial Report Generator")
+
+    task = st.text_input(
+        "Enter the task:",
+        "Analyze the financial data for our company (Awesome Software Inc.) comparing to our competitors.",
+    )
+
+    competitors = st.text_area(
+        "Enter the competitors (comma-separated):", "Microsoft, Apple, Google, Amazon"
+    )
+    max_revisions = st.number_input(
+        "Enter the maximum revisions:", min_value=1, value=2
+    )
+    uploaded_file = st.file_uploader("Choose a company CSV file", type=["csv"])
+
+    if st.button("Generate Report") and uploaded_file is not None:
+        csv_data = uploaded_file.getvalue().decode("utf-8")
 
         initial_state = AgentState(
             task=task,
-            competitors=competitors,
+            competitors=[comp.strip() for comp in competitors.split(",")],
             csv_file=csv_data,
             revision_number=1,
-            max_revision_number=2,
+            max_revisions=max_revisions,
             financial_data="",
             analysis="",
             competitor_data="",
@@ -251,7 +296,17 @@ if __name__ == "__main__":
             content=[],
         )
 
-    thread = {"configurable": {"thread_id": "1"}}
+        thread = {"configurable": {"thread_id": "1"}}
 
-    for s in graph.stream(initial_state, thread):
-        print(s)
+        final_state = None
+        for s in graph.stream(initial_state, thread):
+            st.write(s)
+            final_state = s
+
+        if final_state and "report" in final_state:
+            st.subheader("Financial Report")
+            st.write(final_state["report"])
+
+
+if __name__ == "__main__":
+    main()
