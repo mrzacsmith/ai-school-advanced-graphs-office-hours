@@ -129,7 +129,7 @@ def research_competitors_node(state: AgentState):
         queries = [q.strip() for q in response.content.split("\n") if q.strip()]
 
         for query in queries:
-            search_results = tavily.search(query=query, max_results=2)
+            search_results = tavily.search(query=query, max_results=1)
             for r in search_results["results"]:
                 content.append(r["content"])
     return AgentState(**{**state.dict(), "content": content})
@@ -227,7 +227,7 @@ def read_csv_file(csv_file_path: str) -> str:
 
 if __name__ == "__main__":
     task = "Analyze the financial data for our company (Awesome Software Inc.) comparing to our competitors."
-    competitors = ["Microsoft"]
+    competitors = ["invidia"]
     csv_file_path = "./data/financial_data.csv"
 
     if not os.path.exists(csv_file_path):
