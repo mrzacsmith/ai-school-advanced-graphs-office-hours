@@ -189,7 +189,7 @@ def write_report_node(state: AgentState):
 
 
 def should_continue(state: AgentState):
-    if state.revision_number > state.max_revision_number:
+    if state.revision_number > state.max_revisions:
         return END
     return "collect_feedback"
 
