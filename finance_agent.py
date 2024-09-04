@@ -8,7 +8,6 @@ from langchain_openai import ChatOpenAI
 from openai import OpenAI
 from langgraph.graph import StateGraph, END
 from tavily import TavilyClient
-from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.pydantic_v1 import BaseModel
 from langgraph.checkpoint.sqlite import SqliteSaver
@@ -137,9 +136,9 @@ def research_competitors_node(state: AgentState):
 
 
 def compare_performance_node(state: AgentState):
-    content = "\n".join(state["content"] or [])
+    content = "\n".join(state.content or [])
     user_message = HumanMessage(
-        content=f"{state['task']}\nHere is the financial analysis:\n{state['analysis']}"
+        content=f"{state.task}\nHere is the financial analysis:\n{state.analysis}"
     )
 
     messages = [
@@ -147,43 +146,46 @@ def compare_performance_node(state: AgentState):
         user_message,
     ]
     response = llm_model.invoke(messages)
-    return {
-        "comparasion": response.content,
-        "revision_number": state.get("revision_number", 1) + 1,
-    }
+    return AgentState(
+        **{
+            **state.dict(),
+            "comparison": response.content,
+            "revision_number": state.revision_number + 1,
+        }
+    )
 
 
 def collect_feedback_node(state: AgentState):
     messages = [
         SystemMessage(content=FEEDBACK_PROMPT),
-        HumanMessage(content=state["comparasion"]),
+        HumanMessage(content=state.comparison),
     ]
     response = llm_model.invoke(messages)
-    return {"feedback": response.content, **state}
+    return AgentState(**{**state.dict(), "feedback": response.content})
 
 
 def research_critique_node(state: AgentState):
     queries = llm_model.with_structured_output(Queries).invoke(
         [
             SystemMessage(content=RESEARCH_CRITIQUE_PROMPT),
-            HumanMessage(content=state["feedback"]),
+            HumanMessage(content=state.feedback),
         ]
     )
-    content = state["content"] or []
+    content = state.content or []
     for q in queries.queries:
         search_results = tavily.search(query=q, max_results=2)
         for r in search_results["results"]:
             content.append(r["content"])
-    return {"content": content, **state}
+    return AgentState(**{**state.dict(), "content": content})
 
 
 def write_report_node(state: AgentState):
     messages = [
         SystemMessage(content=WRITE_REPORT_PROMPT),
-        HumanMessage(content=state["comparison"]),
+        HumanMessage(content=state.comparison),
     ]
     response = llm_model.invoke(messages)
-    return {"report": response.content, **state}
+    return AgentState(**{**state.dict(), "report": response.content})
 
 
 def should_continue(state: AgentState):
@@ -225,7 +227,7 @@ def read_csv_file(csv_file_path: str) -> str:
 
 if __name__ == "__main__":
     task = "Analyze the financial data for our company (Awesome Software Inc.) comparing to our competitors."
-    competitors = ["Microsoft", "Apple"]
+    competitors = ["Microsoft"]
     csv_file_path = "./data/financial_data.csv"
 
     if not os.path.exists(csv_file_path):
