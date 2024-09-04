@@ -47,3 +47,33 @@ class AgentState(BaseModel):
 
 class Queries(BaseModel):
     queries: List[str]
+
+
+GATHER_FINANCIAL_DATA_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to extract the financial data and provide a report.
+"""
+ANALYZE_FINANCIAL_DATA_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to analyze the financial data and provide a report.
+"""
+RESEARCH_COMPETITORS_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to research the competitors of the company and provide a report.
+"""
+COMPLETE_PERFORMANCE_REPORT_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to complete the performance report.
+"""
+FEEDBACK_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to provide feedback on the performance report.
+"""
+WRITE_FINANCIAL_REPORT_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to write the financial report.
+"""
+RESEARCH_CRITIQUE_PROMPT = """
+You are a financial analyst. You are given a csv file with financial data for a company.
+Your task is to research and critique the financial report. Generate a max of 3 queries to search for more information.
+"""
