@@ -114,7 +114,6 @@ def research_competitors_node(state: AgentState):
         # Create a prompt for the LLM to generate queries
         prompt = f"Generate search queries to research financial information about {competitor}. The queries should help gather data for comparison with our company (Awesome Software Inc.)."
 
-        # Invoke the LLM with the prompt
         response = llm_model.invoke(
             [
                 SystemMessage(content=RESEARCH_COMPETITORS_PROMPT),

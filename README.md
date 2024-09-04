@@ -26,12 +26,40 @@ This project is a Financial Report Generator that uses AI-powered analysis to cr
 
 ## Setup
 
-1. Install the required dependencies:
+### Using a Virtual Environment
+
+It's recommended to use a virtual environment for this project. Here's how to set it up:
+
+1. Create a virtual environment:
+   ```
+   python -m venv .venv
+   ```
+
+2. Activate the virtual environment:
+   - On Windows:
+     ```
+     .venv\Scripts\activate
+     ```
+   - On macOS and Linux:
+     ```
+     source .venv/bin/activate
+     ```
+
+3. Your command prompt should now show the name of your virtual environment, indicating it's active.
+
+4. Install the required dependencies in the virtual environment:
    ```
    pip install pandas python-dotenv langchain-openai langgraph tavily-python langchain-core pydantic streamlit
    ```
 
-2. Set up your environment variables:
+5. When you're done working on the project, you can deactivate the virtual environment:
+   ```
+   deactivate
+   ```
+
+### Environment Setup
+
+1. Set up your environment variables:
    - Create a `.env` file in the project root
    - Add your API keys:
      ```
@@ -42,6 +70,7 @@ This project is a Financial Report Generator that uses AI-powered analysis to cr
 ## How It Works
 
 The Financial Report Generator uses a graph-based workflow to process and analyze financial data:
+![alt text](image.png)
 
 1. **Gather Financials**: Extracts financial data from the provided CSV file.
 2. **Analyze Data**: Performs initial analysis on the financial data.
@@ -55,10 +84,10 @@ The workflow is implemented using `langgraph`, allowing for conditional processi
 
 ## Usage
 
-Run the Streamlit app:
+Ensure your virtual environment is activated, then run the Streamlit app:
 
 ```
-streamlit run your_script_name.py
+streamlit run finance_agent.py
 ```
 
 In the web interface:
